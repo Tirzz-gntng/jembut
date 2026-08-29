@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Excannor Multi Device</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Arial+Narrow:wght@700&family=Orbitron:wght@500;700;800&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #050506;
+    --panel: rgba(18, 18, 22, 0.78);
+    --line: rgba(255,255,255,.10);
+    --gold: #e8c36a;
+    --gold2: #f5e6b8;
+    --cyan: #7ee7ff;
+    --text: #f4f4f7;
+    --muted: #9aa0ad;
+    --ok: #5dffb1;
+    --err: #ff6b7a;
+    --brat: #8ACE00;
+    --nav-h: 78px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { min-height: 100%; height: 100%; }
+  body {
+    font-family: Sora, system-ui, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(1000px 480px at 12% -8%, rgba(232,195,106,.16), transparent 50%),
+      radial-gradient(800px 400px at 100% 0%, rgba(126,231,255,.09), transparent 45%),
+      linear-gradient(180deg, #0b0b0e 0%, #050506 45%, #000 100%);
+    overflow-x: hidden;
+    padding-bottom: calc(var(--nav-h) + 28px);
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at center, black 25%, transparent 78%);
+  }
+  .shine {
+    position: fixed; inset: -25%;
+    background: conic-gradient(from 200deg, transparent, rgba(232,195,106,.06), transparent 28%);
+    animation: spin 20s linear infinite;
+    pointer-events: none; z-index: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  header {
+    position: relative; z-index: 2;
+    padding: 22px 18px 6px;
+    max-width: 1280px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 48px; height: 48px; border-radius: 15px;
+    background: linear-gradient(145deg, #2a2a32, #0c0c10);
+    border: 1px solid rgba(232,195,106,.45);
+    box-shadow: 0 0 22px rgba(232,195,106,.22), inset 0 1px 0 rgba(255,255,255,.2);
+    display: grid; place-items: center;
+    font-family: Orbitron, sans-serif; font-weight: 800; color: var(--gold); font-size: 14px;
+  }
+  h1 {
+    font-family: Orbitron, sans-serif;
+    font-size: clamp(15px, 2.8vw, 24px);
+    letter-spacing: 1.2px;
+    background: linear-gradient(180deg, #fff 0%, #e8c36a 55%, #9a7a32 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: var(--muted); font-size: 11px; letter-spacing: .3px; }
+  .badge {
+    font-size: 10px; padding: 5px 10px; border-radius: 999px;
+    border: 1px solid rgba(126,231,255,.35);
+    background: rgba(126,231,255,.08); color: var(--cyan);
+  }
+
+  main { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; padding: 12px 16px 20px; }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+  .card {
+    grid-column: span 12;
+    background: var(--panel);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
+    position: relative; overflow: hidden;
+  }
+  .card::after {
+    content: ""; position: absolute; left: -25%; top: -70%; width: 70%; height: 55%;
+    background: linear-gradient(115deg, rgba(255,255,255,.12), transparent 55%);
+    pointer-events: none;
+  }
+  .card.half { grid-column: span 6; }
+  .card.third { grid-column: span 4; }
+  @media (max-width: 900px) {
+    .card.half, .card.third { grid-column: span 12; }
+  }
+  h2 { font-size: 15px; margin-bottom: 4px; position: relative; z-index: 1; }
+  p.hint { color: var(--muted); font-size: 11px; margin-bottom: 10px; line-height: 1.45; position: relative; z-index: 1; }
+  label { display: block; font-size: 11px; color: var(--muted); margin: 8px 0 5px; position: relative; z-index: 1; }
+  input, textarea, select {
+    width: 100%; background: #0b0b10; color: var(--text);
+    border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px;
+    font: 13px Sora, sans-serif; outline: none; position: relative; z-index: 1;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { border-color: rgba(232,195,106,.5); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 1; }
+  .row > * { flex: 1; min-width: 120px; }
+  .btn {
+    appearance: none; border: 0; cursor: pointer;
+    padding: 11px 14px; border-radius: 12px; font: 600 12px Sora, sans-serif;
+    background: linear-gradient(180deg, #f0d48a, #c9a14a);
+    color: #16120a; box-shadow: 0 6px 16px rgba(232,195,106,.22), inset 0 1px 0 #fff6d4;
+    position: relative; z-index: 1;
+  }
+  .btn.ghost {
+    background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
+    color: var(--text); border: 1px solid var(--line); box-shadow: none;
+  }
+  .btn:disabled { opacity: .55; cursor: wait; }
+  .status { margin-top: 8px; font-size: 11px; color: var(--muted); min-height: 16px; position: relative; z-index: 1; }
+  .status.ok { color: var(--ok); }
+  .status.err { color: var(--err); }
+  .preview {
+    margin-top: 10px; display: none; gap: 12px; align-items: flex-start; flex-wrap: wrap;
+    position: relative; z-index: 1;
+  }
+  .preview.show { display: flex; }
+  .preview img {
+    width: 140px; height: 190px; object-fit: cover; border-radius: 12px;
+    border: 1px solid var(--line); background: #111;
+  }
+  .meta { flex: 1; min-width: 180px; font-size: 12px; line-height: 1.55; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  a.dl {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 8px 11px; border-radius: 10px; text-decoration: none; color: #061014;
+    background: linear-gradient(180deg, #8ef0ff, #4ec8e0); font-size: 11px; font-weight: 700;
+  }
+  a.dl.gold { background: linear-gradient(180deg, #f0d48a, #c9a14a); color: #16120a; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip { font-size: 10px; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+  footer {
+    position: relative; z-index: 2; text-align: center; color: #5a6070;
+    font-size: 10px; padding: 6px 14px 12px;
+  }
+  .hidden { display: none !important; }
+  .qrbox { display:flex; justify-content:center; margin-top:10px; position: relative; z-index: 1; }
+  .qrbox img { width: 170px; height: 170px; background:#fff; border-radius:12px; padding:8px; }
+  pre {
+    margin-top: 8px; background: #07070a; border: 1px solid var(--line);
+    border-radius: 12px; padding: 10px; overflow: auto; font-size: 11px; max-height: 240px;
+    position: relative; z-index: 1;
+  }
+
+  /* ——— Liquid bottom navigation ——— */
+  .liquid-nav {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: min(420px, calc(100% - 24px));
+    height: var(--nav-h);
+    border-radius: 28px;
+    background: rgba(12, 12, 16, 0.55);
+    backdrop-filter: blur(22px) saturate(1.4);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow:
+      0 16px 40px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.14),
+      0 0 0 1px rgba(0,0,0,.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 6px;
+    overflow: hidden;
+  }
+  .liquid-nav::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(232,195,106,.08), transparent 40%, rgba(126,231,255,.06));
+    pointer-events: none;
+  }
+  .liquid-blob {
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.35), transparent 45%),
+                linear-gradient(160deg, rgba(232,195,106,.95), rgba(180,130,40,.9));
+    box-shadow:
+      0 8px 24px rgba(232,195,106,.4),
+      inset 0 2px 6px rgba(255,255,255,.45),
+      inset 0 -4px 10px rgba(0,0,0,.25);
+    transition: left .45s cubic-bezier(.34,1.4,.64,1), transform .35s ease;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .liquid-blob::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,.25), transparent 60%);
+    opacity: .7;
+  }
+  .nav-item {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 100%;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: Sora, sans-serif;
+    transition: color .25s ease;
+  }
+  .nav-item.active { color: #1a1408; }
+  .nav-item .ico {
+    font-size: 18px;
+    line-height: 1;
+    filter: drop-shadow(0 1px 0 rgba(0,0,0,.2));
+    transition: transform .3s cubic-bezier(.34,1.4,.64,1);
+  }
+  .nav-item.active .ico { transform: scale(1.15) translateY(-1px); }
+  .nav-item span {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .2px;
+  }
+
+  /* Brat */
+  .brat-canvas-wrap {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  #bratCanvas {
+    width: min(100%, 360px);
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: var(--brat);
+    box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  }
+  .iq-meter {
+    height: 14px;
+    border-radius: 999px;
+    background: #111;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .iq-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff6b7a, #e8c36a, #5dffb1);
+    transition: width 1.2s cubic-bezier(.2,.8,.2,1);
+  }
+  .quote-card {
+    margin-top: 12px;
+    padding: 22px 18px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #1a1a22, #0d0d12);
+    border: 1px solid var(--line);
+    position: relative;
+    z-index: 1;
+    min-height: 120px;
+  }
+  .quote-card p {
+    font-size: 15px;
+    line-height: 1.55;
+    font-style: italic;
+  }
+  .quote-card .q-author {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--gold);
+    font-style: normal;
+  }
+  .fake-chat {
+    margin-top: 10px;
+    background: #0a0a0e;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    padding: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+  }
+  .bubble {
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 14px;
+    margin: 6px 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .bubble.me {
+    margin-left: auto;
+    background: linear-gradient(180deg, #3a7bd5, #2a5a9e);
+    border-bottom-right-radius: 4px;
+  }
+  .bubble.them {
+    background: #22252e;
+    border-bottom-left-radius: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="shine"></div>
+<header>
+  <div class="brand">
+    <div class="logo">EX</div>
+    <div>
+      <h1>EXCANNOR MULTI DEVICE</h1>
+      <div class="sub">Downloader • Music • Brat • Tools</div>
+    </div>
+  </div>
+  <span class="badge">Liquid Nav</span>
+</header>
+
+<main>
+  <!-- DOWNLOADER -->
+  <section id="tab-down" class="grid">
+    <article class="card">
+      <h2>TikTok Downloader</h2>
+      <p class="hint">Tempel link TikTok. Video no-watermark + musik asli via TikWM.</p>
+      <label>URL TikTok</label>
+      <div class="row">
+        <input id="ttUrl" placeholder="https://www.tiktok.com/@user/video/..." />
+        <button class="btn" id="ttBtn">Ambil Media</button>
+      </div>
+      <div class="status" id="ttStatus"></div>
+      <div class="preview" id="ttPreview"></div>
+    </article>
+
+    <article class="card half">
+      <h2>YouTube Info + Thumbnail</h2>
+      <p class="hint">Metadata & thumbnail HD. File video lewat Cobalt.</p>
+      <label>URL YouTube</label>
+      <input id="ytUrl" placeholder="https://www.youtube.com/watch?v=..." />
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="ytBtn">Ambil Info</button>
+        <button class="btn ghost" id="ytCobalt">Buka Cobalt</button>
+      </div>
+      <div class="status" id="ytStatus"></div>
+      <div class="preview" id="ytPreview"></div>
+    </article>
+
+    <article class="card half">
+      <h2>Universal Link</h2>
+      <p class="hint">Deteksi TikTok / YouTube / SoundCloud / X / Instagram.</p>
+      <label>URL apa saja</label>
+      <input id="uniUrl" placeholder="Tempel link" />
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="uniBtn">Proses</button>
+      </div>
+      <div class="status" id="uniStatus"></div>
+      <div class="preview" id="uniPreview"></div>
+    </article>
+  </section>
+
+  <!-- MUSIC -->
+  <section id="tab-music" class="grid hidden">
+    <article class="card half">
+      <h2>TikTok Music</h2>
+      <p class="hint">Ambil audio original dari video TikTok.</p>
+      <input id="musUrl" placeholder="Link TikTok" />
+      <div class="row" style="margin-top:10px"><button class="btn" id="musBtn">Ambil Musik</button></div>
+      <div class="status" id="musStatus"></div>
+      <div class="preview" id="musPreview"></div>
+    </article>
+    <article class="card half">
+      <h2>SoundCloud</h2>
+      <p class="hint">Player oEmbed resmi.</p>
+      <input id="scUrl" placeholder="https://soundcloud.com/..." />
+      <div class="row" style="margin-top:10px"><button class="btn" id="scBtn">Ambil Track</button></div>
+      <div class="status" id="scStatus"></div>
+      <div class="preview" id="scPreview"></div>
+    </article>
+    <article class="card">
+      <h2>Cari Lagu (iTunes)</h2>
+      <p class="hint">Preview 30 detik resmi Apple.</p>
+      <div class="row">
+        <input id="itq" placeholder="Nama lagu / artis" />
+        <button class="btn" id="itBtn">Cari</button>
+      </div>
+      <div class="status" id="itStatus"></div>
+      <div id="itList"></div>
+    </article>
+  </section>
+
+  <!-- FUN: Brat, IQ, Quote, Fake Chat -->
+  <section id="tab-fun" class="grid hidden">
+    <article class="card half">
+      <h2>Brat Generator</h2>
+      <p class="hint">Style Charli XCX — teks blur hijau classic. Download PNG.</p>
+      <label>Teks</label>
+      <textarea id="bratText" placeholder="360&#10;brat">brat</textarea>
+      <label>Ukuran font</label>
+      <input id="bratSize" type="range" min="28" max="120" value="72" />
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="bratBtn">Generate</button>
+        <button class="btn ghost" id="bratDl">Download PNG</button>
+      </div>
+      <div class="brat-canvas-wrap">
+        <canvas id="bratCanvas" width="720" height="720"></canvas>
+      </div>
+    </article>
+
+    <article class="card half">
+      <h2>IQC / IQ Calculator (fun)</h2>
+      <p class="hint">Bukan tes psikologi beneran — pure hiburan berdasarkan nama & mood.</p>
+      <label>Nama kamu</label>
+      <input id="iqName" placeholder="Nama..." />
+      <label>Mood hari ini</label>
+      <select id="iqMood">
+        <option value="1">Chill</option>
+        <option value="2">Deg-degan</option>
+        <option value="3">Overthinking</option>
+        <option value="4">Main karakter</option>
+        <option value="5">Brat energy</option>
+      </select>
+      <button class="btn" id="iqBtn" style="margin-top:10px;width:100%">Hitung IQC</button>
+      <div class="status" id="iqStatus"></div>
+      <div class="iq-meter"><div class="iq-fill" id="iqFill"></div></div>
+      <pre id="iqOut" style="display:none"></pre>
+    </article>
+
+    <article class="card half">
+      <h2>Quote Card</h2>
+      <p class="hint">Buat kartu kutipan siap di-screenshot.</p>
+      <textarea id="qText" placeholder="Kutipan..."></textarea>
+      <input id="qAuthor" placeholder="— Penulis" style="margin-top:8px" />
+      <button class="btn" id="qBtn" style="margin-top:10px">Buat Kartu</button>
+      <div class="quote-card" id="qCard">
+        <p id="qShow">“Tulis kutipanmu...”</p>
+        <div class="q-author" id="qAuthShow"></div>
+      </div>
+    </article>
+
+    <article class="card half">
+      <h2>Fake Chat Generator</h2>
+      <p class="hint">Simulasi chat dua arah. Format: A: pesan / B: pesan</p>
+      <textarea id="chatIn" placeholder="A: halo&#10;B: hai juga&#10;A: lagi apa?"></textarea>
+      <button class="btn" id="chatBtn" style="margin-top:10px">Generate Chat</button>
+      <div class="fake-chat" id="chatOut"></div>
+    </article>
+  </section>
+
+  <!-- TOOLS -->
+  <section id="tab-tools" class="grid hidden">
+    <article class="card third">
+      <h2>QR Generator</h2>
+      <p class="hint">Buat QR dari teks atau URL.</p>
+      <input id="qrText" placeholder="https:// atau teks" />
+      <div class="row" style="margin-top:10px"><button class="btn" id="qrBtn">Buat QR</button></div>
+      <div class="qrbox" id="qrBox"></div>
+    </article>
+    <article class="card third">
+      <h2>Password Generator</h2>
+      <p class="hint">Acak kuat.</p>
+      <label>Panjang</label>
+      <input id="pwLen" type="number" min="6" max="64" value="16" />
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="pwBtn">Generate</button>
+        <button class="btn ghost" id="pwCopy">Salin</button>
+      </div>
+      <input id="pwOut" readonly style="margin-top:10px" />
+    </article>
+    <article class="card third">
+      <h2>Hash SHA-256</h2>
+      <p class="hint">Hash di perangkat (Web Crypto).</p>
+      <textarea id="hashIn" placeholder="Teks..."></textarea>
+      <button class="btn" id="hashBtn" style="margin-top:10px">Hash</button>
+      <input id="hashOut" readonly style="margin-top:10px" />
+    </article>
+    <article class="card half">
+      <h2>Base64 Encode / Decode</h2>
+      <textarea id="b64In" placeholder="Teks atau base64"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="b64e">Encode</button>
+        <button class="btn ghost" id="b64d">Decode</button>
+      </div>
+      <textarea id="b64Out" style="margin-top:10px"></textarea>
+    </article>
+    <article class="card half">
+      <h2>Image → JPEG Kompres</h2>
+      <p class="hint">Lokal, tidak diupload.</p>
+      <input id="imgFile" type="file" accept="image/*" />
+      <label>Kualitas (0.1–1)</label>
+      <input id="imgQ" type="number" min="0.1" max="1" step="0.05" value="0.7" />
+      <button class="btn" id="imgBtn" style="margin-top:10px">Proses</button>
+      <div class="status" id="imgStatus"></div>
+      <div class="preview" id="imgPreview"></div>
+    </article>
+    <article class="card third">
+      <h2>UUID v4</h2>
+      <button class="btn" id="uuidBtn">Generate</button>
+      <input id="uuidOut" readonly style="margin-top:10px" />
+    </article>
+    <article class="card third">
+      <h2>Color Picker</h2>
+      <input id="col" type="color" value="#e8c36a" />
+      <input id="colHex" readonly style="margin-top:10px" />
+    </article>
+    <article class="card third">
+      <h2>Catatan lokal</h2>
+      <textarea id="note" placeholder="Tersimpan di browser"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="noteSave">Simpan</button>
+        <button class="btn ghost" id="noteClear">Hapus</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- INFO -->
+  <section id="tab-net" class="grid hidden">
+    <article class="card half">
+      <h2>IP & Lokasi</h2>
+      <button class="btn" id="ipBtn">Cek IP</button>
+      <div class="status" id="ipStatus"></div>
+      <pre id="ipOut"></pre>
+    </article>
+    <article class="card half">
+      <h2>Cuaca (Open-Meteo)</h2>
+      <div class="row">
+        <input id="city" placeholder="Jakarta / Bandung / ..." />
+        <button class="btn" id="wxBtn">Lihat</button>
+      </div>
+      <div class="status" id="wxStatus"></div>
+      <pre id="wxOut"></pre>
+    </article>
+    <article class="card half">
+      <h2>Kurs Mata Uang</h2>
+      <div class="row">
+        <input id="amt" type="number" value="100000" />
+        <select id="fromC"><option>IDR</option><option>USD</option><option>EUR</option><option>JPY</option><option>SGD</option></select>
+        <select id="toC"><option>USD</option><option>IDR</option><option>EUR</option><option>JPY</option><option>SGD</option></select>
+      </div>
+      <button class="btn" id="fxBtn" style="margin-top:10px">Konversi</button>
+      <div class="status" id="fxStatus"></div>
+    </article>
+    <article class="card half">
+      <h2>GitHub User</h2>
+      <div class="row">
+        <input id="gh" placeholder="username" />
+        <button class="btn" id="ghBtn">Cari</button>
+      </div>
+      <div class="status" id="ghStatus"></div>
+      <div class="preview" id="ghPreview"></div>
+    </article>
+    <article class="card half">
+      <h2>JSON Formatter</h2>
+      <textarea id="jsonIn" placeholder='{"ok":true}'></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="jsonBtn">Rapikan</button>
+        <button class="btn ghost" id="jsonMin">Minify</button>
+      </div>
+      <textarea id="jsonOut" style="margin-top:10px"></textarea>
+    </article>
+    <article class="card half">
+      <h2>Transform Teks</h2>
+      <textarea id="txIn" placeholder="Tulis sesuatu"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost" data-case="upper">UPPER</button>
+        <button class="btn ghost" data-case="lower">lower</button>
+        <button class="btn ghost" data-case="title">Title</button>
+        <button class="btn ghost" data-case="rev">Reverse</button>
+      </div>
+      <textarea id="txOut" style="margin-top:10px"></textarea>
+    </article>
+  </section>
+</main>
+
+<footer>Excannor Multi Device — unduh hanya konten yang boleh kamu simpan.</footer>
+
+<!-- Liquid Navigation (bottom) -->
+<nav class="liquid-nav" id="liquidNav" aria-label="Menu utama">
+  <div class="liquid-blob" id="liquidBlob"></div>
+  <button class="nav-item active" data-tab="down" data-i="0">
+    <div class="ico">⬇</div><span>Down</span>
+  </button>
+  <button class="nav-item" data-tab="music" data-i="1">
+    <div class="ico">♪</div><span>Music</span>
+  </button>
+  <button class="nav-item" data-tab="fun" data-i="2">
+    <div class="ico">✦</div><span>Fun</span>
+  </button>
+  <button class="nav-item" data-tab="tools" data-i="3">
+    <div class="ico">⚙</div><span>Tools</span>
+  </button>
+  <button class="nav-item" data-tab="net" data-i="4">
+    <div class="ico">◎</div><span>Info</span>
+  </button>
+</nav>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const setStatus = (el, msg, kind) => { el.textContent = msg; el.className = "status " + (kind || ""); };
+
+/* ——— Liquid nav ——— */
+const tabs = ["down","music","fun","tools","net"];
+const navItems = [...document.querySelectorAll(".nav-item")];
+const blob = $("liquidBlob");
+
+function moveBlob(i) {
+  const item = navItems[i];
+  const nav = $("liquidNav");
+  const ir = item.getBoundingClientRect();
+  const nr = nav.getBoundingClientRect();
+  const x = ir.left - nr.left + ir.width / 2;
+  blob.style.left = x + "px";
+}
+
+function switchTab(tab) {
+  tabs.forEach(t => $("tab-" + t).classList.toggle("hidden", t !== tab));
+  navItems.forEach((btn, i) => {
+    const on = btn.dataset.tab === tab;
+    btn.classList.toggle("active", on);
+    if (on) moveBlob(i);
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+navItems.forEach((btn, i) => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+window.addEventListener("resize", () => {
+  const active = navItems.findIndex(b => b.classList.contains("active"));
+  if (active >= 0) moveBlob(active);
+});
+requestAnimationFrame(() => moveBlob(0));
+
+/* ——— TikTok / shared helpers ——— */
+async function tikwm(url) {
+  const endpoint = "https://www.tikwm.com/api/?hd=1&url=" + encodeURIComponent(url);
+  const res = await fetch(endpoint);
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const json = await res.json();
+  if (json.code !== 0) throw new Error(json.msg || "Gagal mengambil data TikTok");
+  return json.data;
+}
+function absTik(u) {
+  if (!u) return "";
+  if (u.startsWith("http")) return u;
+  return "https://www.tikwm.com" + (u.startsWith("/") ? u : "/" + u);
+}
+function renderTik(target, data, statusEl) {
+  const play = absTik(data.play || data.hdplay);
+  const wm = absTik(data.wmplay);
+  const music = absTik(data.music);
+  const cover = absTik(data.cover || data.origin_cover);
+  const author = data.author ? (data.author.nickname || data.author.unique_id) : "";
+  target.className = "preview show";
+  target.innerHTML = `
+    <img src="${cover}" alt="cover" />
+    <div class="meta">
+      <strong>${(data.title || "Tanpa judul").slice(0,160)}</strong><br/>
+      ${author}<br/>Durasi: ${data.duration || "-"}s
+      <div class="chips">
+        <span class="chip">${(data.play_count||0).toLocaleString()} play</span>
+        <span class="chip">${(data.digg_count||0).toLocaleString()} like</span>
+      </div>
+      <div class="links">
+        ${play ? `<a class="dl gold" href="${play}" target="_blank" download>Video No WM</a>` : ""}
+        ${wm ? `<a class="dl" href="${wm}" target="_blank" download>Video WM</a>` : ""}
+        ${music ? `<a class="dl" href="${music}" target="_blank" download>Musik</a>` : ""}
+      </div>
+    </div>`;
+  setStatus(statusEl, "Siap diunduh.", "ok");
+}
+
+$("ttBtn").onclick = async () => {
+  const url = $("ttUrl").value.trim();
+  if (!url) return setStatus($("ttStatus"), "Masukkan URL TikTok.", "err");
+  $("ttBtn").disabled = true;
+  setStatus($("ttStatus"), "Menghubungi TikWM...");
+  try {
+    const data = await tikwm(url);
+    renderTik($("ttPreview"), data, $("ttStatus"));
+  } catch (e) {
+    setStatus($("ttStatus"), e.message, "err");
+  } finally { $("ttBtn").disabled = false; }
+};
+
+$("musBtn").onclick = async () => {
+  const url = $("musUrl").value.trim();
+  if (!url) return setStatus($("musStatus"), "Masukkan URL.", "err");
+  $("musBtn").disabled = true;
+  setStatus($("musStatus"), "Mengambil audio...");
+  try {
+    const data = await tikwm(url);
+    const music = absTik(data.music);
+    const info = data.music_info || {};
+    $("musPreview").className = "preview show";
+    $("musPreview").innerHTML = `
+      <div class="meta">
+        <strong>${info.title || data.title || "Audio TikTok"}</strong><br/>
+        ${info.author || ""}
+        <div class="links">${music ? `<a class="dl gold" href="${music}" target="_blank" download>Download Musik</a>` : "Audio tidak tersedia"}</div>
+        ${music ? `<audio controls src="${music}" style="width:100%;margin-top:10px"></audio>` : ""}
+      </div>`;
+    setStatus($("musStatus"), "Audio siap.", "ok");
+  } catch (e) { setStatus($("musStatus"), e.message, "err"); }
+  finally { $("musBtn").disabled = false; }
+};
+
+function ytId(u) {
+  try {
+    const url = new URL(u);
+    if (url.hostname.includes("youtu.be")) return url.pathname.slice(1);
+    return url.searchParams.get("v") || (url.pathname.includes("/shorts/") ? url.pathname.split("/shorts/")[1] : "");
+  } catch { return ""; }
+}
+
+$("ytBtn").onclick = async () => {
+  const url = $("ytUrl").value.trim();
+  if (!url) return setStatus($("ytStatus"), "Masukkan URL YouTube.", "err");
+  setStatus($("ytStatus"), "Mengambil oEmbed...");
+  try {
+    const res = await fetch("https://www.youtube.com/oembed?format=json&url=" + encodeURIComponent(url));
+    if (!res.ok) throw new Error("Video tidak ditemukan / privat");
+    const info = await res.json();
+    const id = ytId(url);
+    const thumbs = id ? [
+      `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+      `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+    ] : [info.thumbnail_url];
+    $("ytPreview").className = "preview show";
+    $("ytPreview").innerHTML = `
+      <img src="${thumbs[0]}" onerror="this.src='${thumbs[1]||info.thumbnail_url}'" />
+      <div class="meta">
+        <strong>${info.title}</strong><br/>${info.author_name}
+        <div class="links">
+          <a class="dl gold" href="${thumbs[0]}" target="_blank" download>Thumbnail HD</a>
+          <a class="dl" href="https://cobalt.tools/#${encodeURIComponent(url)}" target="_blank">Unduh via Cobalt</a>
+        </div>
+      </div>`;
+    setStatus($("ytStatus"), "Metadata OK.", "ok");
+  } catch (e) { setStatus($("ytStatus"), e.message, "err"); }
+};
+$("ytCobalt").onclick = () => {
+  const url = $("ytUrl").value.trim();
+  if (!url) return setStatus($("ytStatus"), "Masukkan URL dulu.", "err");
+  window.open("https://cobalt.tools/#" + encodeURIComponent(url), "_blank");
+};
+
+async function oembed(api, url) {
+  const res = await fetch(api + encodeURIComponent(url));
+  if (!res.ok) throw new Error("Tidak bisa mengambil embed");
+  return res.json();
+}
+
+$("uniBtn").onclick = async () => {
+  const url = $("uniUrl").value.trim();
+  if (!url) return setStatus($("uniStatus"), "Tempel URL.", "err");
+  setStatus($("uniStatus"), "Mendeteksi...");
+  const u = url.toLowerCase();
+  try {
+    if (u.includes("tiktok.com") || u.includes("vt.tiktok") || u.includes("vm.tiktok")) {
+      const data = await tikwm(url);
+      renderTik($("uniPreview"), data, $("uniStatus"));
+      return;
+    }
+    if (u.includes("youtube.com") || u.includes("youtu.be")) {
+      $("ytUrl").value = url; $("ytBtn").click();
+      setStatus($("uniStatus"), "Diteruskan ke YouTube.", "ok");
+      return;
+    }
+    if (u.includes("soundcloud.com")) {
+      $("scUrl").value = url; $("scBtn").click();
+      setStatus($("uniStatus"), "Diteruskan ke SoundCloud.", "ok");
+      return;
+    }
+    if (u.includes("twitter.com") || u.includes("x.com")) {
+      const info = await oembed("https://publish.twitter.com/oembed?url=", url);
+      $("uniPreview").className = "preview show";
+      $("uniPreview").innerHTML = `<div class="meta">${info.author_name || ""}<br/><a class="dl" href="${url}" target="_blank">Buka post</a>
+        <div style="margin-top:8px">${info.html || ""}</div></div>`;
+      setStatus($("uniStatus"), "Embed X dimuat.", "ok");
+      return;
+    }
+    if (u.includes("instagram.com")) {
+      $("uniPreview").className = "preview show";
+      $("uniPreview").innerHTML = `<div class="meta">Instagram membatasi unduhan browser.
+        <div class="links"><a class="dl gold" href="https://cobalt.tools/#${encodeURIComponent(url)}" target="_blank">Coba via Cobalt</a></div></div>`;
+      setStatus($("uniStatus"), "Instagram: gunakan Cobalt.", "ok");
+      return;
+    }
+    $("uniPreview").className = "preview show";
+    $("uniPreview").innerHTML = `<div class="meta">Platform tidak dikenali.
+      <div class="links"><a class="dl gold" href="https://cobalt.tools/#${encodeURIComponent(url)}" target="_blank">Coba Cobalt</a></div></div>`;
+    setStatus($("uniStatus"), "Fallback Cobalt.", "ok");
+  } catch (e) { setStatus($("uniStatus"), e.message, "err"); }
+};
+
+$("scBtn").onclick = async () => {
+  const url = $("scUrl").value.trim();
+  if (!url) return setStatus($("scStatus"), "Masukkan URL SoundCloud.", "err");
+  setStatus($("scStatus"), "Mengambil oEmbed...");
+  try {
+    const info = await oembed("https://soundcloud.com/oembed?format=json&url=", url);
+    $("scPreview").className = "preview show";
+    $("scPreview").innerHTML = `<div class="meta"><strong>${info.title}</strong><br/>${info.author_name || ""}
+      <div style="margin-top:8px">${info.html || ""}</div></div>`;
+    setStatus($("scStatus"), "Player dimuat.", "ok");
+  } catch (e) { setStatus($("scStatus"), e.message, "err"); }
+};
+
+$("itBtn").onclick = async () => {
+  const q = $("itq").value.trim();
+  if (!q) return setStatus($("itStatus"), "Ketik judul lagu.", "err");
+  setStatus($("itStatus"), "Mencari iTunes...");
+  try {
+    const res = await fetch("https://itunes.apple.com/search?entity=song&limit=8&term=" + encodeURIComponent(q));
+    const data = await res.json();
+    if (!data.results?.length) throw new Error("Tidak ketemu");
+    $("itList").innerHTML = data.results.map(t => `
+      <div class="preview show" style="margin-top:10px">
+        <img src="${t.artworkUrl100}" style="width:80px;height:80px" />
+        <div class="meta"><strong>${t.trackName}</strong><br/>${t.artistName}
+          <div class="links">
+            ${t.previewUrl ? `<audio controls src="${t.previewUrl}"></audio>` : ""}
+            <a class="dl" href="${t.trackViewUrl}" target="_blank">iTunes</a>
+          </div>
+        </div>
+      </div>`).join("");
+    setStatus($("itStatus"), data.resultCount + " hasil.", "ok");
+  } catch (e) { setStatus($("itStatus"), e.message, "err"); }
+};
+
+/* ——— Brat generator ——— */
+function drawBrat() {
+  const canvas = $("bratCanvas");
+  const ctx = canvas.getContext("2d");
+  const text = $("bratText").value || "brat";
+  const size = +$("bratSize").value || 72;
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = "#8ACE00";
+  ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(W/2, H/2);
+  ctx.fillStyle = "#000";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  // Arial Narrow-like + slight blur for classic brat look
+  ctx.font = `700 ${size}px "Arial Narrow", Arial, sans-serif`;
+  ctx.filter = "blur(0.6px)";
+  const lines = text.split("\n");
+  const lineH = size * 1.05;
+  const startY = -((lines.length - 1) * lineH) / 2;
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 0, startY + i * lineH);
+  });
+  ctx.restore();
+}
+$("bratBtn").onclick = drawBrat;
+$("bratSize").oninput = drawBrat;
+$("bratText").oninput = () => { /* live optional */ };
+$("bratDl").onclick = () => {
+  drawBrat();
+  const a = document.createElement("a");
+  a.download = "excannor-brat.png";
+  a.href = $("bratCanvas").toDataURL("image/png");
+  a.click();
+};
+drawBrat();
+
+/* ——— IQC fun ——— */
+$("iqBtn").onclick = () => {
+  const name = ($("iqName").value || "Anonim").trim();
+  const mood = +$("iqMood").value || 1;
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  const base = 85 + (h % 55);
+  const bonus = mood * 4 + (h % 7);
+  const iq = Math.min(160, Math.max(70, base + bonus - 10));
+  const labels = [
+    "Masih loading otak",
+    "Normal banget",
+    "Cukup tajam",
+    "Overthinker certified",
+    "Brat genius energy"
+  ];
+  const tier = iq < 90 ? 0 : iq < 110 ? 1 : iq < 125 ? 2 : iq < 140 ? 3 : 4;
+  $("iqFill").style.width = Math.min(100, ((iq - 60) / 100) * 100) + "%";
+  $("iqOut").style.display = "block";
+  $("iqOut").textContent = `${name}\nIQC skor: ${iq}\nTier: ${labels[tier]}\n\n*Ini hiburan, bukan tes psikologi.`;
+  setStatus($("iqStatus"), "Hasil IQC siap (fun only).", "ok");
+};
+
+/* ——— Quote ——— */
+$("qBtn").onclick = () => {
+  const t = $("qText").value.trim() || "Tulis kutipanmu...";
+  const a = $("qAuthor").value.trim();
+  $("qShow").textContent = "“" + t + "”";
+  $("qAuthShow").textContent = a ? "— " + a : "";
+};
+
+/* ——— Fake chat ——— */
+$("chatBtn").onclick = () => {
+  const lines = $("chatIn").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const box = $("chatOut");
+  box.innerHTML = "";
+  lines.forEach(line => {
+    const m = line.match(/^(A|B)\s*[:：\-]\s*(.+)$/i);
+    const div = document.createElement("div");
+    if (m) {
+      div.className = "bubble " + (m[1].toUpperCase() === "A" ? "me" : "them");
+      div.textContent = m[2];
+    } else {
+      div.className = "bubble them";
+      div.textContent = line;
+    }
+    box.appendChild(div);
+  });
+};
+
+/* ——— Tools ——— */
+$("qrBtn").onclick = () => {
+  const t = $("qrText").value.trim();
+  if (!t) return;
+  $("qrBox").innerHTML = `<img alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(t)}" />`;
+};
+$("pwBtn").onclick = () => {
+  const n = Math.min(64, Math.max(6, +$("pwLen").value || 16));
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*_-";
+  const arr = new Uint32Array(n);
+  crypto.getRandomValues(arr);
+  $("pwOut").value = Array.from(arr, x => chars[x % chars.length]).join("");
+};
+$("pwCopy").onclick = async () => {
+  if ($("pwOut").value) await navigator.clipboard.writeText($("pwOut").value);
+};
+$("hashBtn").onclick = async () => {
+  const enc = new TextEncoder().encode($("hashIn").value);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  $("hashOut").value = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+};
+$("b64e").onclick = () => { $("b64Out").value = btoa(unescape(encodeURIComponent($("b64In").value))); };
+$("b64d").onclick = () => {
+  try { $("b64Out").value = decodeURIComponent(escape(atob($("b64In").value))); }
+  catch { $("b64Out").value = "Bukan base64 valid"; }
+};
+$("uuidBtn").onclick = () => { $("uuidOut").value = crypto.randomUUID(); };
+$("col").oninput = () => { $("colHex").value = $("col").value; };
+$("colHex").value = $("col").value;
+$("note").value = localStorage.getItem("excannor-note") || "";
+$("noteSave").onclick = () => { localStorage.setItem("excannor-note", $("note").value); };
+$("noteClear").onclick = () => { $("note").value = ""; localStorage.removeItem("excannor-note"); };
+$("imgBtn").onclick = () => {
+  const f = $("imgFile").files[0];
+  if (!f) return setStatus($("imgStatus"), "Pilih gambar.", "err");
+  const q = Math.min(1, Math.max(0.1, +$("imgQ").value || 0.7));
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const max = 1600;
+      let w = img.width, h = img.height;
+      if (Math.max(w,h) > max) { const s = max / Math.max(w,h); w = Math.round(w*s); h = Math.round(h*s); }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      const data = canvas.toDataURL("image/jpeg", q);
+      $("imgPreview").className = "preview show";
+      $("imgPreview").innerHTML = `<img src="${data}" style="width:160px;height:auto" /><div class="meta">
+        ${w}×${h}<br/>~${Math.round(data.length/1024)} KB
+        <div class="links"><a class="dl gold" href="${data}" download="excannor.jpg">Download JPEG</a></div></div>`;
+      setStatus($("imgStatus"), "Selesai lokal.", "ok");
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(f);
+};
+
+$("ipBtn").onclick = async () => {
+  setStatus($("ipStatus"), "Mengambil...");
+  try {
+    const ip = await (await fetch("https://api.ipify.org?format=json")).json();
+    let extra = {};
+    try { extra = await (await fetch("https://ipapi.co/json/")).json(); } catch {}
+    $("ipOut").textContent = JSON.stringify({ ip: ip.ip, city: extra.city, region: extra.region, country: extra.country_name, org: extra.org }, null, 2);
+    setStatus($("ipStatus"), "OK", "ok");
+  } catch (e) { setStatus($("ipStatus"), e.message, "err"); }
+};
+$("wxBtn").onclick = async () => {
+  setStatus($("wxStatus"), "Mencari...");
+  try {
+    let lat, lon, name;
+    const city = $("city").value.trim();
+    if (city) {
+      const geo = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent(city))).json();
+      if (!geo.results?.[0]) throw new Error("Kota tidak ditemukan");
+      lat = geo.results[0].latitude; lon = geo.results[0].longitude; name = geo.results[0].name;
+    } else {
+      const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
+      lat = pos.coords.latitude; lon = pos.coords.longitude; name = "Lokasi perangkat";
+    }
+    const wx = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m`)).json();
+    $("wxOut").textContent = JSON.stringify({ place: name, lat, lon, current: wx.current }, null, 2);
+    setStatus($("wxStatus"), "Cuaca terbaru.", "ok");
+  } catch (e) { setStatus($("wxStatus"), e.message, "err"); }
+};
+$("fxBtn").onclick = async () => {
+  const amount = +$("amt").value || 0;
+  const from = $("fromC").value, to = $("toC").value;
+  setStatus($("fxStatus"), "Mengambil kurs...");
+  try {
+    const data = await (await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`)).json();
+    setStatus($("fxStatus"), `${amount} ${from} = ${data.rates[to]} ${to}`, "ok");
+  } catch (e) { setStatus($("fxStatus"), e.message, "err"); }
+};
+$("ghBtn").onclick = async () => {
+  const u = $("gh").value.trim();
+  if (!u) return;
+  setStatus($("ghStatus"), "Mengambil...");
+  try {
+    const p = await (await fetch("https://api.github.com/users/" + encodeURIComponent(u))).json();
+    if (p.message) throw new Error(p.message);
+    $("ghPreview").className = "preview show";
+    $("ghPreview").innerHTML = `<img src="${p.avatar_url}" style="width:80px;height:80px;border-radius:50%" /><div class="meta">
+      <strong>${p.name || p.login}</strong><br/>${p.bio || ""}<br/>Repos ${p.public_repos} · Followers ${p.followers}
+      <div class="links"><a class="dl" href="${p.html_url}" target="_blank">GitHub</a></div></div>`;
+    setStatus($("ghStatus"), "OK", "ok");
+  } catch (e) { setStatus($("ghStatus"), e.message, "err"); }
+};
+$("jsonBtn").onclick = () => {
+  try { $("jsonOut").value = JSON.stringify(JSON.parse($("jsonIn").value), null, 2); }
+  catch (e) { $("jsonOut").value = e.message; }
+};
+$("jsonMin").onclick = () => {
+  try { $("jsonOut").value = JSON.stringify(JSON.parse($("jsonIn").value)); }
+  catch (e) { $("jsonOut").value = e.message; }
+};
+document.querySelectorAll("[data-case]").forEach(btn => {
+  btn.onclick = () => {
+    const s = $("txIn").value;
+    const m = btn.dataset.case;
+    $("txOut").value = m === "upper" ? s.toUpperCase() : m === "lower" ? s.toLowerCase() : m === "rev" ? [...s].reverse().join("") : s.replace(/\w\S*/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase());
+  };
+});
+</script>
+</body>
+</html>
